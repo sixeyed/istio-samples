@@ -1,0 +1,67 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: productpage-v2
+  labels:
+    app: productpage
+    version: v2
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: productpage
+      version: v2
+  template:
+    metadata:
+      labels:
+        app: productpage
+        version: v2
+    spec:
+      serviceAccountName: bookinfo-productpage
+      containers:
+        - name: productpage
+          image: docker.io/sixeyed/bookinfo-productpage:v2
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 9080
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: DestinationRule
+metadata:
+  name: productpage
+spec:
+  host: productpage
+  trafficPolicy:
+    tls:
+      mode: ISTIO_MUTUAL
+  subsets:
+    - name: v1
+      labels:
+        version: v1
+    - name: v2
+      labels:
+        version: v2
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: bookinfo
+spec:
+  hosts:
+    - "*"
+  gateways:
+    - bookinfo-gateway
+  http:
+    - route:
+        - destination:
+            host: productpage
+            subset: v1
+            port:
+              number: 9080
+          weight: 70
+        - destination:
+            host: productpage
+            subset: v2
+            port:
+              number: 9080
+          weight: 30
