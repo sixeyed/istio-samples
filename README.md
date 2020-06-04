@@ -6,4 +6,4 @@ Istio demos using the [standard bookinfo demo app](https://github.com/istio/isti
 - service authorization
 - mesh visualization
 
-See [Getting Started with Istio Using Docker Desktop]().
+See [Getting Started with Istio Using Docker Desktop](https://www.docker.com/blog/getting-started-with-istio-using-docker-desktop/).
